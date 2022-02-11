@@ -1,0 +1,92 @@
+                                                                   internsctl.sh
+#!/bin/bash
+input=$1
+if [ "--" = "${input:0:2}" ]
+then
+if [ "${input:2:${#input}}" = "version" ]
+then
+echo "v0.1.0";
+elif [ "${input:2:${#input}}" = "help" ]
+then 
+echo "internsctl --version (It will show the version of the command)"
+echo "internsctl cpu getinfo (It will show the cpu information of my server)"
+echo "internsctl memory getinfo (It will show the memory information of your>
+echo "internsctl user list (It will show the list of all the users)"
+echo "internsctl user list --sudo-only (It will show the list of all the use>
+echo "internsctl file getinfo (It will show the information of the file"
+echo "internsctl file getinfo[options] <file-name> (It will show only specif>
+fi
+elif [ "$input" = "-v" ]
+then 
+echo "v0.1.0";
+elif [ "$input" = "-h" ]
+then
+echo "internsctl --version (It will show the version of the command)"
+echo "internsctl cpu getinfo (It will show the cpu information of myserver)"
+echo "internsctl memory getinfo (It will show the memory information of your>
+echo "internsctl user list (It will show the list of all the users)"
+echo "internsctl user list --sudo-only (It will show the list of all the use>
+echo "internsctl file getinfo (It will show the information of the file"
+echo "internsctl file getinfo[options] <file-name> (It will show only specif>
+elif [ "$input" = "cpu" ]
+then
+if [ "$2" = "getinfo" ]
+then
+echo $(lscpu);
+fi
+elif [ "$input" = "memory" ]
+then 
+if [ "$2" = "getinfo" ]
+then
+echo $(free)
+fi
+elif [ "$input" = "user" ]
+then 
+if [ "$2" = "create" ]
+then
+echo $(sudo useradd $3) 
+echo "account $3 is created successfully"
+elif [ "$2" = "list" ]
+then
+if [ "$3" = "--sudo-only" ]
+then 
+echo $(grep -Po '^sudo.+:\K.*$' /etc/group);
+else
+echo $(getent passwd);
+fi
+fi
+elif [ "$input" = "file" ]
+then
+if [ "$2" = "getinfo" ]
+then
+user_input=$3
+if [ "${user_input:0:2}" = "--" ]
+then
+if [ "$user_input" = "--size" ]
+then 
+        echo "$(ls -l $4 | cut -d " " -f5)"
+        exit 0
+
+elif [ "$user_input" = "--permissions" ]
+then 
+        echo "$(ls -l $4 | cut -d " " -f1)" 
+        exit 0
+elif [ "$user_input" = "--owner" ]
+then 
+        echo "$(ls -l $4 | cut -d " " -f3)" 
+        exit 0
+elif [ "$user_input" = "--last-modified" ]
+then 
+        echo "$(ls -l $4 | cut -d " " -f 6-9)"; 
+        exit 0
+fi
+else 
+echo "File : $3"
+echo "Access : $(ls -l $3 | cut -d " " -f1)"
+echo "Size : $(ls -l $3 | cut -d " " -f5)" 
+echo "Owner : $(ls -l $3 | cut -d " " -f3)"
+echo "Modified : $(ls -l $3 | cut -d " " -f 6-9 )"
+fi
+fi
+
+fi
